@@ -15,8 +15,8 @@ Panel {
   manageIpc: false
 
   property double nowMs: Date.now()
-  readonly property var state: service.state
-  readonly property string level: Model.level(state)
+  readonly property var snapshot: service.snapshot
+  readonly property string level: Model.level(snapshot)
   readonly property color foreground: Color.popups.text
   readonly property color dim: Qt.darker(foreground, 1.55)
   readonly property color urgent: Color.urgent
@@ -60,7 +60,7 @@ Panel {
     labelVisible: false
     hasVisualContent: true
     fixedWidth: vertical ? -1 : Style.space(30)
-    tooltipText: Model.tooltip(root.state)
+    tooltipText: Model.tooltip(root.snapshot)
     active: root.level === "waiting"
     onPressed: function(buttonCode) {
       if (buttonCode === Qt.RightButton || root.level === "off") root.launch(["--show"])
@@ -111,7 +111,7 @@ Panel {
           }
 
           Text {
-            text: root.state.running ? Model.tooltip(root.state) : "Not running"
+            text: root.snapshot.running ? Model.tooltip(root.snapshot) : "Not running"
             color: root.level === "waiting" ? root.urgent : root.dim
             font.family: root.fontFamily
             font.pixelSize: Style.font.caption
@@ -121,7 +121,7 @@ Panel {
         PanelSeparator { width: parent.width; foreground: root.foreground }
 
         Text {
-          visible: root.state.running && root.state.agents.length === 0
+          visible: root.snapshot.running && root.snapshot.agents.length === 0
           width: parent.width
           text: "No agents yet."
           color: root.dim
@@ -130,7 +130,7 @@ Panel {
         }
 
         Repeater {
-          model: root.state.agents
+          model: root.snapshot.agents
           delegate: AgentRow {
             required property var modelData
             width: content.width
@@ -139,14 +139,14 @@ Panel {
         }
 
         PanelSeparator {
-          visible: root.state.running
+          visible: root.snapshot.running
           width: parent.width
           foreground: root.foreground
         }
 
         Text {
           id: openLink
-          text: root.state.running ? "Open Octopus" : "Start Octopus"
+          text: root.snapshot.running ? "Open Octopus" : "Start Octopus"
           color: openArea.containsMouse ? root.foreground : root.dim
           font.family: root.fontFamily
           font.pixelSize: Style.font.body

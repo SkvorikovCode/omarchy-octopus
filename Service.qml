@@ -11,7 +11,7 @@ Item {
   readonly property string statusPath: (Quickshell.env("XDG_RUNTIME_DIR") || "") + "/octopus/status.json"
   property var parsed: ({ ok: false, pid: 0, agents: [], counts: { working: 0, waiting: 0, unread: 0 } })
   property bool alive: false
-  readonly property var state: ({
+  readonly property var snapshot: ({
     ok: parsed.ok,
     running: parsed.ok && alive,
     pid: parsed.pid,
