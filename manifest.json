@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "skvorikovcode.octopus",
+  "name": "Octopus",
+  "version": "0.1.0",
+  "author": "Octopus AI contributors",
+  "license": "Apache-2.0",
+  "description": "Octopus coding agents in the Omarchy bar: one icon that lights up when an agent waits for you, and a list that opens any session.",
+  "kinds": ["bar-widget"],
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "Octopus",
+    "description": "Agents working or waiting for an answer in Octopus; click a session to open it.",
+    "category": "AI",
+    "aliases": ["octopus", "octopus-ai"],
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "command": "octopus-ai"
+    },
+    "schema": [
+      {
+        "key": "command",
+        "type": "string",
+        "label": "Octopus command",
+        "defaultValue": "octopus-ai",
+        "description": "The program that starts Octopus; it also receives --show and --session <id>."
+      }
+    ]
+  }
+}

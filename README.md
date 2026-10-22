@@ -1,60 +1,65 @@
-# omarchy-octopus
+# Octopus for Omarchy
 
-An [Omarchy](https://omarchy.org/) shell plugin that puts your
-[Octopus AI](https://github.com/SkvorikovCode/Octopus-AI) agents in the top bar:
-how many are working, how many are waiting for you, and a way to jump straight
-into a session without leaving what you're doing.
+A bar widget for [Octopus](https://github.com/SkvorikovCode/Octopus-AI), the desktop app for coding agents.
 
-## How it works
+One icon in the Omarchy bar shows the state of your agents:
+- in the theme's urgent color while an agent waits for your answer;
+- in the bar's text color while agents work;
+- dimmed while they are idle or Octopus is not running.
 
-While it runs, Octopus AI writes a snapshot of its agents to
-`$XDG_RUNTIME_DIR/octopus/status.json` — atomically, mode `0600`, removed on
-exit. The plugin watches that file and renders it in the bar. Clicking an agent
-opens its session with `octopus-ai --session <id>`.
+Click it for the list of agents: title, project, branch of a worktree copy, and how long the current turn has run. Click a row to open that session in Octopus. Right-click, or a click while Octopus is not running, opens the Octopus window.
 
-The file looks like this:
+![Octopus widget](preview.png)
 
-```json
-{
-  "format": 1,
-  "pid": 546976,
-  "updatedAt": 1792670000000,
-  "agents": [
-    {
-      "sessionId": "…",
-      "title": "Fix login",
-      "project": "/home/u/app",
-      "branch": "octopus/fix-login",
-      "status": "waiting",
-      "unread": false,
-      "since": 1792669900000
-    }
-  ],
-  "counts": { "working": 1, "waiting": 1, "unread": 0 }
-}
-```
+## Requirements
 
-`status` is one of `starting`, `working`, `waiting`, `idle`, `offline`. Agents
-waiting for an answer come first, then working ones.
+- Omarchy with the Quattro shell (plugin support).
+- Octopus 0.3 or newer. Octopus writes `$XDG_RUNTIME_DIR/octopus/status.json` and accepts `--show` and `--session <id>`; the widget only reads that file and runs `octopus-ai`.
 
 ## Install
 
-```bash
+```sh
 omarchy plugin add https://github.com/SkvorikovCode/omarchy-octopus.git --enable
 ```
 
-Plugins run unsandboxed inside the long-lived `omarchy-shell` process. Read the
-code before you enable it.
+From a local checkout:
 
-## Development
+```sh
+omarchy plugin add ~/code/omarchy-octopus --enable
+```
 
-Work on a copy under `~/.config/omarchy/plugins/` — edits there reload on save.
-Check the manifest before publishing:
+## Configure
 
-```bash
+If Octopus is not on your `PATH` as `octopus-ai` (an AppImage, a build from source), point the widget at it:
+
+```sh
+omarchy bar set skvorikovcode.octopus command /path/to/octopus-ai
+```
+
+Move the icon:
+
+```sh
+omarchy bar move skvorikovcode.octopus --section right
+```
+
+## How it works
+
+Octopus writes `$XDG_RUNTIME_DIR/octopus/status.json` atomically whenever an agent's status changes, and removes it on exit. The widget watches that file, and checks `/proc/<pid>/comm` so that a file left by a crash does not show stale agents. Commands run through `uwsm-app` as an argument list, never through a shell.
+
+## Develop
+
+```sh
+node --test tests/
 omarchy plugin validate .
+qmllint -I "$OMARCHY_PATH/shell" Panel.qml Service.qml
+```
+
+## Remove
+
+```sh
+omarchy plugin remove skvorikovcode.octopus
 ```
 
 ## License
 
-Apache-2.0 — see [LICENSE](LICENSE).
+[Apache-2.0](LICENSE)
