@@ -32,6 +32,14 @@ Panel {
     Quickshell.execDetached(["uwsm-app", "--", root.command].concat(args))
   }
 
+  // Keyboard selection: a row index, or agents.length for "Open Octopus".
+  property int selected: 0
+
+  function activateSelected() {
+    var agents = root.snapshot.agents
+    root.openSession(selected < agents.length ? agents[selected].sessionId : "")
+  }
+
   function openSession(id) {
     root.close()
     root.launch(id ? ["--session", id] : ["--show"])
@@ -39,6 +47,7 @@ Panel {
 
   onOpenedChanged: if (opened) {
     nowMs = Date.now()
+    selected = 0
     Qt.callLater(function() { keyCatcher.forceActiveFocus() })
   }
 
@@ -91,7 +100,10 @@ Panel {
       anchors.fill: parent
       onCloseRequested: root.close()
       onTabRequested: function(direction) { root.switchPanel(direction) }
-      onActivateRequested: root.openSession("")
+      onActivateRequested: root.activateSelected()
+      onMoveRequested: function(dx, dy) {
+        if (dy !== 0) root.selected = Math.max(0, Math.min(root.snapshot.agents.length, root.selected + dy))
+      }
 
       Column {
         id: content
@@ -133,8 +145,10 @@ Panel {
           model: root.snapshot.agents
           delegate: AgentRow {
             required property var modelData
+            required property int index
             width: content.width
             agent: modelData
+            selected: index === root.selected
           }
         }
 
@@ -147,7 +161,7 @@ Panel {
         Text {
           id: openLink
           text: root.snapshot.running ? "Open Octopus" : "Start Octopus"
-          color: openArea.containsMouse ? root.foreground : root.dim
+          color: openArea.containsMouse || root.selected === root.snapshot.agents.length ? root.foreground : root.dim
           font.family: root.fontFamily
           font.pixelSize: Style.font.body
           font.bold: true
@@ -192,10 +206,11 @@ Panel {
   component AgentRow: Rectangle {
     id: row
     property var agent: ({})
+    property bool selected: false
     readonly property bool waiting: agent.status === "waiting"
     implicitHeight: rowContent.implicitHeight + Style.space(10)
     radius: Style.space(6)
-    color: rowArea.containsMouse ? Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.08) : "transparent"
+    color: rowArea.containsMouse || row.selected ? Qt.rgba(root.foreground.r, root.foreground.g, root.foreground.b, 0.08) : "transparent"
 
     MouseArea {
       id: rowArea
