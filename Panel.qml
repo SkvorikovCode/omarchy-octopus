@@ -6,10 +6,11 @@ import qs.Commons
 import qs.Ui
 import "Model.js" as Model
 
-// One icon in the bar: while an agent waits for an answer it takes the urgent
-// color and a dot (monochrome themes make "urgent" a gray, so the dot carries the
-// meaning), the bar's text color while agents work, dimmed when they are idle or
-// Octopus is not running. A click lists the agents; a row opens its session.
+// One icon in the bar: while an agent waits for an answer it gets a dot and the
+// theme's urgent color (or the bar's text color where a monochrome theme makes
+// "urgent" a gray, which would read dimmer than idle), the bar's text color while
+// agents work, dimmed when they are idle or Octopus is not running. A click lists
+// the agents; a row opens its session.
 Panel {
   id: root
   moduleName: "skvorikovcode.octopus"
@@ -21,6 +22,8 @@ Panel {
   readonly property color foreground: Color.popups.text
   readonly property color dim: Qt.darker(foreground, 1.55)
   readonly property color urgent: Color.urgent
+  // Waiting must never look calmer than working: a desaturated "urgent" gives way.
+  readonly property color waitingColor: urgent.hslSaturation > 0.25 ? urgent : barForeground
   readonly property string fontFamily: bar ? bar.fontFamily : Style.font.family
   // The command that starts Octopus or hands it arguments (a second launch
   // passes them to the running copy).
@@ -81,7 +84,7 @@ Panel {
       anchors.centerIn: parent
       iconSize: Style.space(15)
       badge: root.level === "waiting"
-      color: root.level === "waiting" ? root.urgent
+      color: root.level === "waiting" ? root.waitingColor
         : root.level === "working" ? root.barForeground
         : Qt.darker(root.barForeground, 1.8)
     }
@@ -210,10 +213,14 @@ Panel {
       width: Math.max(4, Math.round(icon.iconSize * 0.34))
       height: width
       radius: width / 2
-      // The SVG leaves this corner empty, and the button clips anything outside the icon.
+      // In the corner the SVG leaves empty, level with the neighbours' tops; the ring
+      // in the bar's background color keeps a gap to the dome.
       anchors.right: parent.right
       anchors.top: parent.top
+      anchors.topMargin: 2
       color: root.barForeground
+      border.width: 1
+      border.color: Color.bar.background
     }
   }
 
@@ -247,11 +254,11 @@ Panel {
         width: Style.space(7)
         height: width
         radius: width / 2
-        color: row.waiting ? root.urgent
+        color: row.waiting ? root.waitingColor
           : row.agent.status === "working" ? root.foreground
           : "transparent"
         border.width: 1
-        border.color: row.waiting ? root.urgent : root.dim
+        border.color: row.waiting ? root.waitingColor : root.dim
       }
 
       Column {
