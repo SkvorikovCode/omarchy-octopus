@@ -5,9 +5,10 @@
   "version": "0.1.0",
   "author": "Octopus AI contributors",
   "license": "Apache-2.0",
-  "description": "Octopus coding agents in the Omarchy bar: one icon that lights up when an agent waits for you, and a list that opens any session.",
-  "kinds": ["bar-widget"],
+  "description": "Octopus coding agents in the Omarchy bar: one icon that lights up when an agent waits for you, a list that opens any session, and Octopus in the colors of the current theme.",
+  "kinds": ["service", "bar-widget"],
   "entryPoints": {
+    "service": "ThemeSync.qml",
     "barWidget": "Panel.qml"
   },
   "barWidget": {
