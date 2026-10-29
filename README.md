@@ -3,7 +3,7 @@
 A bar widget for [Octopus](https://github.com/SkvorikovCode/Octopus-AI), the desktop app for coding agents.
 
 One icon in the Omarchy bar shows the state of your agents:
-- in the theme's urgent color while an agent waits for your answer;
+- in the theme's urgent color, with a dot, while an agent waits for your answer (the dot keeps it visible in monochrome themes, where "urgent" is a gray);
 - in the bar's text color while agents work;
 - dimmed while they are idle or Octopus is not running.
 
@@ -53,6 +53,8 @@ node --test tests/
 omarchy plugin validate .
 qmllint -I "$OMARCHY_PATH/shell" Panel.qml Service.qml
 ```
+
+The shell reloads a changed plugin on save, but a bar widget that is already placed can keep running the previous QML. Run `omarchy restart shell` before judging a change.
 
 ## Remove
 

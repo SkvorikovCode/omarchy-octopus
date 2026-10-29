@@ -6,9 +6,10 @@ import qs.Commons
 import qs.Ui
 import "Model.js" as Model
 
-// One icon in the bar: the urgent color while an agent waits for an answer, the
-// bar's text color while agents work, dimmed when they are idle or Octopus is
-// not running. A click lists the agents; a row opens its session in Octopus.
+// One icon in the bar: while an agent waits for an answer it takes the urgent
+// color and a dot (monochrome themes make "urgent" a gray, so the dot carries the
+// meaning), the bar's text color while agents work, dimmed when they are idle or
+// Octopus is not running. A click lists the agents; a row opens its session.
 Panel {
   id: root
   moduleName: "skvorikovcode.octopus"
@@ -79,6 +80,7 @@ Panel {
     OctopusIcon {
       anchors.centerIn: parent
       iconSize: Style.space(15)
+      badge: root.level === "waiting"
       color: root.level === "waiting" ? root.urgent
         : root.level === "working" ? root.barForeground
         : Qt.darker(root.barForeground, 1.8)
@@ -182,6 +184,7 @@ Panel {
     id: icon
     property real iconSize: Style.space(15)
     property color color: root.barForeground
+    property bool badge: false
     width: iconSize
     height: iconSize
 
@@ -200,6 +203,17 @@ Panel {
       source: mask
       colorization: 1.0
       colorizationColor: icon.color
+    }
+
+    Rectangle {
+      visible: icon.badge
+      width: Math.max(4, Math.round(icon.iconSize * 0.34))
+      height: width
+      radius: width / 2
+      // The SVG leaves this corner empty, and the button clips anything outside the icon.
+      anchors.right: parent.right
+      anchors.top: parent.top
+      color: root.barForeground
     }
   }
 
