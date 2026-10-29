@@ -19,7 +19,8 @@
     "allowMultiple": false,
     "defaultSection": "right",
     "defaults": {
-      "command": "octopus-ai"
+      "command": "octopus-ai",
+      "showWhenClosed": false
     },
     "schema": [
       {
@@ -28,6 +29,13 @@
         "label": "Octopus command",
         "defaultValue": "octopus-ai",
         "description": "The program that starts Octopus; it also receives --show and --session <id>."
+      },
+      {
+        "key": "showWhenClosed",
+        "type": "boolean",
+        "label": "Show while Octopus is closed",
+        "defaultValue": false,
+        "description": "Keep a dimmed icon in the bar while Octopus is not running; a click starts it."
       }
     ]
   }

@@ -5,9 +5,11 @@ A bar widget and theme sync for [Octopus](https://github.com/SkvorikovCode/Octop
 One icon in the Omarchy bar shows the state of your agents:
 - in the theme's urgent color, with a dot, while an agent waits for your answer (the dot keeps it visible in monochrome themes, where "urgent" is a gray);
 - in the bar's text color while agents work;
-- dimmed while they are idle or Octopus is not running.
+- dimmed while they are idle.
 
-Click it for the list of agents: title, project, branch of a worktree copy, and how long the current turn has run. Click a row to open that session in Octopus. Right-click, or a click while Octopus is not running, opens the Octopus window.
+While Octopus is not running the icon is not in the bar at all.
+
+Click it for the list of agents: title, project, branch of a worktree copy, and how long the current turn has run. Click a row to open that session in Octopus. Right-click opens the Octopus window.
 
 ![Octopus widget](preview.png)
 
@@ -36,6 +38,12 @@ If Octopus is not on your `PATH` as `octopus-ai` (an AppImage, a build from sour
 
 ```sh
 omarchy bar set skvorikovcode.octopus command /path/to/octopus-ai
+```
+
+Keep a dimmed icon while Octopus is closed, to start it from the bar:
+
+```sh
+omarchy bar set skvorikovcode.octopus showWhenClosed true --json
 ```
 
 Move the icon:

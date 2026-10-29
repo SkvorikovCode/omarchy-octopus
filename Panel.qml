@@ -9,8 +9,9 @@ import "Model.js" as Model
 // One icon in the bar: while an agent waits for an answer it gets a dot and the
 // theme's urgent color (or the bar's text color where a monochrome theme makes
 // "urgent" a gray, which would read dimmer than idle), the bar's text color while
-// agents work, dimmed when they are idle or Octopus is not running. A click lists
-// the agents; a row opens its session.
+// agents work, dimmed when they are idle. While Octopus is not running the icon
+// is gone (unless the showWhenClosed setting keeps it, dimmed, as a launcher).
+// A click lists the agents; a row opens its session.
 Panel {
   id: root
   moduleName: "skvorikovcode.octopus"
@@ -28,7 +29,11 @@ Panel {
   // The command that starts Octopus or hands it arguments (a second launch
   // passes them to the running copy).
   readonly property string command: String((settings && settings.command) || "octopus-ai")
+  readonly property bool showWhenClosed: !!settings && (settings.showWhenClosed === true || settings.showWhenClosed === "true")
 
+  // The bar collapses the slot of an invisible widget.
+  visible: root.snapshot.running || root.showWhenClosed
+  onVisibleChanged: if (!visible && opened) close()
   implicitWidth: iconButton.implicitWidth
   implicitHeight: iconButton.implicitHeight
 
