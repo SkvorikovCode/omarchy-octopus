@@ -26,6 +26,8 @@ Octopus also follows the current Omarchy theme: on every `omarchy theme set` the
 omarchy plugin add https://github.com/SkvorikovCode/omarchy-octopus.git --enable
 ```
 
+Plugins run unsandboxed inside the long-lived `omarchy-shell` process. Read the code before you enable it.
+
 From a local checkout:
 
 ```sh
@@ -54,7 +56,29 @@ omarchy bar move skvorikovcode.octopus --section right
 
 ## How it works
 
-Octopus writes `$XDG_RUNTIME_DIR/octopus/status.json` atomically whenever an agent's status changes, and removes it on exit. The widget watches that file, and checks `/proc/<pid>/comm` so that a file left by a crash does not show stale agents. Commands run through `uwsm-app` as an argument list, never through a shell.
+Octopus writes `$XDG_RUNTIME_DIR/octopus/status.json` atomically (mode `0600`) whenever an agent's status changes, and removes it on exit:
+
+```json
+{
+  "format": 1,
+  "pid": 546976,
+  "updatedAt": 1792670000000,
+  "agents": [
+    {
+      "sessionId": "…",
+      "title": "Fix login",
+      "project": "/home/u/app",
+      "branch": "octopus/fix-login",
+      "status": "waiting",
+      "unread": false,
+      "since": 1792669900000
+    }
+  ],
+  "counts": { "working": 1, "waiting": 1, "unread": 0 }
+}
+```
+
+`status` is one of `starting`, `working`, `waiting`, `idle`, `offline`; agents waiting for an answer come first, then working ones. The widget watches that file, and checks `/proc/<pid>/comm` so that a file left by a crash does not show stale agents. Commands run through `uwsm-app` as an argument list, never through a shell.
 
 The theme sync (`ThemeSync.qml`, a service) watches `~/.local/state/omarchy/current/theme.name`. On a switch it reads the theme's `colors.toml`, derives Octopus's colors in `Theme.js`, and writes `~/.config/octopus/palette.json` atomically, only when the palette changed:
 - In dark themes the page is the theme's background, and tiles are mixed a few percent towards the text color.
